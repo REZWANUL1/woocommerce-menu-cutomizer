@@ -23,10 +23,9 @@ function load_my_plugin_translation()
 }
 add_action('plugins_loaded', 'load_my_plugin_translation');
 
+//? load carbon filed 
 use Carbon_Fields\Container;
 use Carbon_Fields\Field;
-
-
 add_action('carbon_fields_register_fields', 'crb_attach_theme_options');
 function crb_attach_theme_options()
 {
@@ -40,6 +39,7 @@ function crb_attach_theme_options()
       
 }
 
+//? load carbon filed
 add_action('after_setup_theme', 'crb_load');
 function crb_load()
 {
