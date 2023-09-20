@@ -22,3 +22,27 @@ function load_my_plugin_translation()
    load_plugin_textdomain('your-plugin-textdomain', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 }
 add_action('plugins_loaded', 'load_my_plugin_translation');
+
+use Carbon_Fields\Container;
+use Carbon_Fields\Field;
+
+
+add_action('carbon_fields_register_fields', 'crb_attach_theme_options');
+function crb_attach_theme_options()
+{
+   Container::make('post_meta', __('User Settings'))
+      ->where('post_type', '=', 'page')
+      ->add_tab(__('Profile'), array(
+         Field::make('text', 'crb_first_name', __('First Name')),
+         Field::make('text', 'crb_last_name', __('Last Name')),
+         Field::make('text', 'crb_position', __('Position')),
+      ));
+      
+}
+
+add_action('after_setup_theme', 'crb_load');
+function crb_load()
+{
+   require_once('vendor/autoload.php');
+   \Carbon_Fields\Carbon_Fields::boot();
+}
