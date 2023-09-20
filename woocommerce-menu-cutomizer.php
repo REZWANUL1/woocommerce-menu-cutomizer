@@ -26,6 +26,7 @@ add_action('plugins_loaded', 'load_my_plugin_translation');
 //? load carbon filed 
 use Carbon_Fields\Container;
 use Carbon_Fields\Field;
+
 add_action('carbon_fields_register_fields', 'crb_attach_theme_options');
 function crb_attach_theme_options()
 {
@@ -35,8 +36,9 @@ function crb_attach_theme_options()
          Field::make('text', 'crb_first_name', __('First Name')),
          Field::make('text', 'crb_last_name', __('Last Name')),
          Field::make('text', 'crb_position', __('Position')),
+         Field::make('text', 'crb_phone_number', __('Phone Number'))
+            ->set_attribute('placeholder', '(***) ***-****'),
       ));
-      
 }
 
 //? load carbon filed
