@@ -28,8 +28,8 @@ use Carbon_Fields\Container;
 use Carbon_Fields\Field;
 
 //? add carbon fields conditions to menu
-add_action('carbon_fields_register_fields', 'crb_attach_theme_options');
-function crb_attach_theme_options()
+add_action('carbon_fields_register_fields', 'wmcrh_attach_menu_options');
+function wmcrh_attach_menu_options()
 {
    global $wpdb;
    $posts_table = $wpdb->prefix . 'posts';
@@ -51,41 +51,36 @@ function crb_attach_theme_options()
    }
    Container::make('nav_menu_item', __('User Settings'))
       ->add_fields(array(
-         Field::make('Select', 'crb_color', __('Display Products Hare'))
+         Field::make('Select', 'crb_product', __('Display Products Hare'))
             ->set_options(
                $_products
             )
       ));
 }
-
-
 //? Get the nav menus by filter
 add_filter('wp_get_nav_menu_items', 'crb_get_nav_menu_item');
 function crb_get_nav_menu_item($items)
 {
-   if (!is_admin()) {
-      unset($items[1]);
-   }
-   return $items;
-}
-add_action("admin_footer", "admin_footercallback");
-function admin_footercallback()
-{
-   global $wpdb;
-   $posts_table = $wpdb->prefix . 'posts';
-   $query = "SELECT ID, post_title FROM $posts_table 
-          WHERE post_type = 'product' AND post_status = 'publish'";
-   $_products = [0 => 'Always Display'];
-   $results = $wpdb->get_results($query, ARRAY_A);
-   // Check if there are results
-   if ($results) {
-      foreach ($results as $product) {
-         $_products[$product['ID']] = $product['post_title'];
+   foreach ($items as $key => $item) {
+      $to_hide = [];
+      if (!is_admin()) {
+         $product_id = carbon_get_nav_menu_item_meta($item->ID, 'crb_product');
+
+         if ($product_id != 0) {
+            $current_user = wp_get_current_user();
+            if ($current_user) {
+               $is_owner = wc_customer_bought_product($current_user->user_email, $current_user->ID, $product_id);
+               if (!$is_owner) {
+                  $to_hide[$key] = $item->ID;
+               }
+            }
+         }
+      }
+      foreach ($to_hide as $key => $value) {
+         unset($items[$key]);
       }
    }
-   // echo "<pre>";
-   // print_r($_products);
-   // echo "</pre>";
+   return $items;
 }
 
 //? load carbon filed
