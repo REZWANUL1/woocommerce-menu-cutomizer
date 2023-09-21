@@ -31,6 +31,9 @@ use Carbon_Fields\Field;
 add_action('carbon_fields_register_fields', 'wmcrh_attach_menu_options');
 function wmcrh_attach_menu_options()
 {
+   if (!class_exists("WooCommerce")) {
+      return;
+   }
    global $wpdb;
    $posts_table = $wpdb->prefix . 'posts';
    $query = "SELECT ID, post_title FROM $posts_table 
@@ -61,9 +64,12 @@ function wmcrh_attach_menu_options()
 add_filter('wp_get_nav_menu_items', 'crb_get_nav_menu_item');
 function crb_get_nav_menu_item($items)
 {
-   foreach ($items as $key => $item) {
-      $to_hide = [];
-      if (!is_admin()) {
+   if (!class_exists("WooCommerce")) {
+      return $items;
+   }
+   $to_hide = [];
+   if (!is_admin()) {
+      foreach ($items as $key => $item) {
          $product_id = carbon_get_nav_menu_item_meta($item->ID, 'crb_product');
 
          if ($product_id != 0) {
