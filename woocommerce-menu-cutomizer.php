@@ -27,6 +27,7 @@ add_action('plugins_loaded', 'load_my_plugin_translation');
 use Carbon_Fields\Container;
 use Carbon_Fields\Field;
 
+//? add carbon fields conditions to menu
 add_action('carbon_fields_register_fields', 'crb_attach_theme_options');
 function crb_attach_theme_options()
 {
@@ -57,12 +58,19 @@ function crb_attach_theme_options()
       ));
 }
 
+
+//? Get the nav menus by filter
+add_filter('wp_get_nav_menu_items', 'crb_get_nav_menu_item');
+function crb_get_nav_menu_item($items)
+{
+   if (!is_admin()) {
+      unset($items[1]);
+   }
+   return $items;
+}
 add_action("admin_footer", "admin_footercallback");
 function admin_footercallback()
 {
-   // global $wpdb;
-   // $products = $wpdb->get_results('SELECT ID, post_title FROM {$wpdb->prefix}posts WHERE post_status="publish" AND post_type="product"', ARRAY_A);
-   // print_r($products);
    global $wpdb;
    $posts_table = $wpdb->prefix . 'posts';
    $query = "SELECT ID, post_title FROM $posts_table 
@@ -75,7 +83,9 @@ function admin_footercallback()
          $_products[$product['ID']] = $product['post_title'];
       }
    }
-   print_r($_products);
+   // echo "<pre>";
+   // print_r($_products);
+   // echo "</pre>";
 }
 
 //? load carbon filed
