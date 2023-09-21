@@ -30,15 +30,52 @@ use Carbon_Fields\Field;
 add_action('carbon_fields_register_fields', 'crb_attach_theme_options');
 function crb_attach_theme_options()
 {
-   Container::make('post_meta', __('User Settings'))
-      ->where('post_type', '=', 'page')
-      ->add_tab(__('Profile'), array(
-         Field::make('text', 'crb_first_name', __('First Name')),
-         Field::make('text', 'crb_last_name', __('Last Name')),
-         Field::make('text', 'crb_position', __('Position')),
-         Field::make('text', 'crb_phone_number', __('Phone Number'))
-            ->set_attribute('placeholder', '(***) ***-****'),
+   global $wpdb;
+   $posts_table = $wpdb->prefix . 'posts';
+   $query = "SELECT ID, post_title FROM $posts_table 
+          WHERE post_type = 'product' AND post_status = 'publish'";
+   $_products = [0 => 'Always Display'];
+   $results = $wpdb->get_results($query, ARRAY_A);
+   // Check if there are results
+   if ($results) {
+      foreach ($results as $product) {
+         $_products[$product['ID']] = $product['post_title'];
+      }
+   }
+
+   if ($results) {
+      foreach ($results as $product) {
+         $_products[$product['ID']] = $product['post_title'];
+      }
+   }
+   Container::make('nav_menu_item', __('User Settings'))
+      ->add_fields(array(
+         Field::make('Select', 'crb_color', __('Display Products Hare'))
+            ->set_options(
+               $_products
+            )
       ));
+}
+
+add_action("admin_footer", "admin_footercallback");
+function admin_footercallback()
+{
+   // global $wpdb;
+   // $products = $wpdb->get_results('SELECT ID, post_title FROM {$wpdb->prefix}posts WHERE post_status="publish" AND post_type="product"', ARRAY_A);
+   // print_r($products);
+   global $wpdb;
+   $posts_table = $wpdb->prefix . 'posts';
+   $query = "SELECT ID, post_title FROM $posts_table 
+          WHERE post_type = 'product' AND post_status = 'publish'";
+   $_products = [0 => 'Always Display'];
+   $results = $wpdb->get_results($query, ARRAY_A);
+   // Check if there are results
+   if ($results) {
+      foreach ($results as $product) {
+         $_products[$product['ID']] = $product['post_title'];
+      }
+   }
+   print_r($_products);
 }
 
 //? load carbon filed
